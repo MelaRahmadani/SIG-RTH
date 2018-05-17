@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+        <link rel="stylesheet" href="dropdown.css">
+		<title>RTHKP</title>
+		<h2 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Sebaran Ruang Terbuka Hijau Kawasan Perkotaan</center></h2>
+		<h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>di Bandar Lampung</center></h4>
+        <style>
+            #map {
+                width: 100%;
+                height: 490px;
+            }
+        </style>
 <title>RTHKP</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,6 +24,32 @@
         }
     </style>
 </head>
+<body style = "background-color:rgb(191, 247, 191)">
+		<br>
+			<nav class="menu">
+					<ul>
+						<li><a href="#">Home</a>
+							<ul>
+								<li><a href="RTH.html">Lihat dengan Cluster</a></li>
+								<li><a href="polygon-template.html">Lihat dengan Polygon</a></li>
+								<li><a href="geomarker.html">Lihat dengan Geojson</a></li>
+							</ul>
+						<li><a href="#">Klasifikasi RTH</a>
+							<ul>
+								<li><a href="alamatnya">RTH Alih Fungsi</a></li>
+								<li><a href="alamatnya">RTH Aktif</a></li>
+								<li><a href="alamatnya">RTH dalam Pembangunan</a></li>
+							</ul>
+						</li>
+						<li><a href="#">Jalur</a>
+							<ul>
+								<li><a href="alamatnya">Dari Pusat Kota</a></li>
+								<li><a href="alamatnya">Dari Terminal Rajabasa</a></li>
+							</ul>
+						</li>
+						<li><a href="alamatnya" onClick="return confirm ('Hubungi bebekgoreng@gmail.com')">Help</a></li>
+					</ul>
+				</nav>
 <body>
     <div id = "map"></div>
     <script src="https://www.gstatic.com/firebasejs/5.0.1/firebase.js"></script>
