@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+		<title>RTHKP</title>
+		<h2 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Sebaran Ruang Terbuka Hijau Kawasan Perkotaan</center></h2>
+		<h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>di Bandar Lampung</center></h4>
+        <style>
+            #map {
+                width: 100%;
+                height: 490px;
+            }
+        </style>
+    </head>
+    <body style = "background-color:rgb(191, 247, 191)">
+        <div id="map"></div>
+    </body>
+    <script>
+function initMap() {
+	var lampung={lat: -4.558585, lng: 105.406808};
+	var map=new google.maps.Map(document.getElementById('map'),{zoom:7,center:lampung});
+	console.log(map);
+	var infowindow = new google.maps.InfoWindow();
+	var contentString = '<h3>PROVINSI LAMPUNG</h3><hr>' +
+						'<h5> Luas 34.623,80 km2, jumlah penduduk 9.543.231 Jiwa</h5>';
+						infowindow.setContent(contentString);
+
+	var marker=new google.maps.Marker({position:lampung,map:map});
+    marker.addListener('click',function(){
+	infowindow.open(map,marker);
+	});
+
+	var infoWin = new google.maps.InfoWindow();
+	// Add some markers to the map.
+	// Note: The code uses the JavaScript Array.prototype.map() method to
+	// create an array of markers based on a given "locations" array.
+	// The map() method here has nothing to do with the Google Maps API.
+	var markers = locations.map(function(location, i) {
+    var marker = new google.maps.Marker({position: location});
+
+    google.maps.event.addListener(marker, 'click', function(evt){
+	infoWin.setContent(location.info);
+	infoWin.open(map, marker);
+	})
+    return marker;
+	});
+
+	// Add a marker clusterer to manage the markers.
+	var markerCluster = new MarkerClusterer(map, markers, {
+    imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+	});
+
+}
+
+	var locations = [
+        {lat: -5.421654, lng: 105.259917, info: '<h3 style = background:#7EF84C;"><center>TAMAN GAJAH</center></h3><hr> <h4>Luas Daerah 15.000 m2, diresmikan pada 10 feb 2018</h4>'},
+        {lat: -5.400208, lng: 105.207889, info: '<h3 style = background:#7EF84C;"><center>TAMAN KALPATARU</center></h3><hr> <h4>Fasilitas olah raga yang tersedia adalah lapangan sepak bola & jogging track di sekeliling lapangan</h4>'},
+		{lat: -5.445769, lng: 105.262162, info: '<h3 style = background:#7EF84C;"><center>TAMAN DIPANGGA</center></h3><hr> <h4>Luas Daerah 800 m2, didirikan pada tahun 1981</h4>'},
+        {lat: -5.380881, lng: 105.284523, info: '<h3 style = background:#7EF84C;"><center>TAMAN HUTAN KOTA</center></h3><hr> <h4>Merupakan salah satu kawasan konservasi alam di Kota Bandar Lampung</h4>'},
+        {lat: -5.4186770922581, lng: 105.26024378419, info:'<h3 style =background:#7EF84C;"><center>Lapangan Enggal Saburai</center></h3><hr> <h4>Merupakan RTH dibawah pengwasan Korem 043/Gatam yang berfungsi sebagai pusat latihan baris-berbaris atau event-event besar pemerintah provinsi/kota</h4>'},
+		{lat:  -5.443950, lng: 105.268740, info:'<h3 style =background:#7EF84C;"><center>Taman Refleksi</center></h3><hr> <h4>Taman ini memiliki ciri khas trek refleksi dengan panjang mencapai 250 meter mengelilingi taman.</h4>'},
+		{lat:  -5.429119, lng: 105.261522, info:'<h3 style =background:#7EF84C;"><center>Taman Kota Lungsir</center></h3><hr> <h4>Merupakann Ruang Terbuka Hijau yang aktif sebagai tempat wisata kuliner di malam hari.</h4>'},
+		{lat:  -5.432279, lng: 105.269484, info:'<h3 style =background:#7EF84C;"><center>Taman Wisata Hutan Kera</center></h3><hr> <h4>Kawasan hutan wisata sejak tahun 1984,terdapat pemandangan kera liar dan pemandangan kota dengan view laut</h4>'},
+		{lat:  -5.440251, lng: 105.265634, info:'<h3 style =background:#7EF84C;"><center>Tugu Perbankan Lampung</center></h3><hr> <h4>merupakan Wisata Sejarah dan Budaya</h4>'},
+		];
+
+	google.maps.event.addDomListener(window, "load", initMap);
+	</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgguC6i63tqFRC_6V86XosB4gCmBM8mRU&callback=initMap"></script>
+<script src="src/markerclusterer.js">
+</script>
+		<h5 style="color:darkgreen; font-family:'Franklin Gothic Medium';"><center>1617051049-1617051075-1617051099</center></h5>
+</html>

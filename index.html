@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="dropdown.css">
+<br>
+ <title>Sistem Informasi Geografis</title>
+ <h1 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Sistem Informasi Geografis</center></h1>
+ <h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>- Ruang Terbuka Hijau Kawasan Perkotaan -</center></h4>
+  <script src="geo.js"></script>
+
+  <script>
+var map;
+var markers = [];
+var marker;
+function taruhMarker(map, posisiTitik){
+
+    if( marker ){
+      marker.setPosition(posisiTitik);
+    } else {
+      marker = new google.maps.Marker({
+        position: posisiTitik,
+        map: map
+      });
+    }
+    document.getElementById("lat").value = posisiTitik.lat();
+    document.getElementById("lng").value = posisiTitik.lng();
+    document.getElementById("info").value = posisiTitik.info();
+
+}
+
+function initialize() {
+    var LPG = new google.maps.LatLng(-5.3971, 105.2668);
+    var mapOptions = {
+        zoom: 13,
+        center: LPG,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+
+    google.maps.event.addListener(map, 'click', function(event) {
+              taruhMarker(this, event.latLng);
+    });
+    google.maps.event.addListener(map, 'dblclick', function(event) {
+                addMarker(event.latLng);
+    });
+
+    google.maps.event.addListener(map, 'rightclick', function(event) {
+                marker.setMap(null);
+    });
+}
+
+function addMarker(location) {
+        var marker = new google.maps.Marker({
+        position: location,
+        map: map
+    });
+    google.maps.event.addListener(marker, 'rightclick', function(event) {
+        marker.setMap(null);
+    });
+    markers.push(marker);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+
+
+</script>
+
+</head>
+
+<!--
+<table>
+<tr>
+<td align=left valign=top Style="width:35%; font-size: 16px; padding: 10px; line-height: 40px;">
+		<a href="?">Home</a><br/>  
+		<a href="RTH.html">RTH di Bandar Lampung dengan Cluster</a><br/>
+		<a href="polygon-template.html">RTH di Bandar Lampung dengan Polygon</a></td><br><br>
+		
+<td>
+-->
+<body style= "background-color:rgb(191, 247, 191)">
+    
+<br>
+<nav>
+        <ul>
+            <li><a href="#">Home</a>
+                <ul>
+                    <li><a href="RTH.html">Lihat dengan Cluster</a></li>
+                    <li><a href="polygon-template.html">Lihat dengan Polygon</a></li>
+					<li><a href="geojson.html">Lihat dengan Geojson</a></li>
+                </ul>
+            <li><a href="#">Klasifikasi RTH</a>
+                <ul>
+                    <li><a href="alamatnya">RTH Alih Fungsi</a></li>
+                    <li><a href="alamatnya">RTH Aktif</a></li>
+                    <li><a href="alamatnya">RTH dalam Pembangunan</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Jalur</a>
+                <ul>
+                    <li><a href="alamatnya">Dari Pusat Kota</a></li>
+                    <li><a href="alamatnya">Dari Terminal Rajabasa</a></li>
+                </ul>
+            </li>
+            <li><a href="alamatnya" onClick="return confirm ('Hubungi bebekgoreng@gmail.com')">Help</a></li>
+        </ul>
+    </nav>
+
+  <center><div id="map-canvas" style="width:100%;height:460px;background-color:#233237"></div> </center>
+
+
+  <form style="padding: 20px 20px;" >
+
+ <table style="font-family: “Palatino Linotype”, “Book Antiqua”, Palatino, serif;font-size: 18px;width: 500px; margin: auto;">
+ <tr>
+ <td style="color:darkgreen; font-family:'Franklin Gothic Medium';">Latitude</td>   <td style="color:darkgreen; font-family:'Franklin Gothic Medium';">Longitude </td> </tr>
+ <tr>
+ <td><input type="text" id="lat" name="lat" value="" style="width:240px; height:25px"> </td>
+ <td><input type="text" id="lng" name="lng" value="" style="width:240px; height:25px"> </td> </tr>
+ <center>
+ </table>
+
+  </form>
+  </td>
+ </tr>
+ </table>
+</body>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDp_xw2HnxsncHgz7XDPrFVsUp_JllvKbY&callback=initMap">
+</script>
+</html>

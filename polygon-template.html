@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>RTHKP</title>
+    <h2 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Area Ruang Terbuka Hijau Kawasan Perkotaan</center></h2>
+    <h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>di Bandar Lampung</center></h4>
+    <style>
+        #map{
+            height: 490px;
+            width: 100%;
+            background: rgb(202, 199, 199);
+        }
+        #save{
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body  style = "background-color:rgb(191, 247, 191)">
+    <div id="map"></div>
+    <!-- latitude<input type="text" id="latitude">
+    longitude<input type="text" id="latitude"> -->
+    <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
+    <script>
+          // Initialize Firebase
+          var config = {
+            apiKey: "AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE",
+            authDomain: "polygon-12.firebaseapp.com",
+            databaseURL: "https://polygon-12.firebaseio.com",
+            projectId: "polygon-12",
+            storageBucket: "polygon-12.appspot.com",
+            messagingSenderId: "1016968270496"
+          };
+          firebase.initializeApp(config);
+
+var db              = firebase.database();
+var dataRef         = db.ref('presentasi');
+var newPolygon      = null;
+var arrayPolygon    = [];
+var map             = null;
+var coords          = [];
+var markers         = [];
+var center          = {lat:-5.367284, lng:105.244935};
+
+dataRef.on('value', updateInfo, showErr);
+
+function initMap(){
+    map=new google.maps.Map(document.getElementById('map'),{
+        zoom:12,
+        center:center
+    });
+
+    map.addListener('click', function (e) {
+        var latLng = e.latLng;
+        coords.push({lat: latLng.lat(), lng: latLng.lng()});
+        markers.push(createMarker({lat: latLng.lat(), lng: latLng.lng()}));
+    });
+}
+
+
+/*var coords=[
+                {lat:4,lng:20},
+                {lat:11,lng:14},
+                {lat:3,lng:1}
+            ];
+var lines = {points:coords}; */
+
+function createPolygon(coord){
+    var tempPoly=new google.maps.Polygon({
+        paths:coord,
+        strokeColor: '#FF0000',
+        strokeOpacity:0.8,
+        strokeWeight:2,
+        fillColor:'#FF0000',
+        fillOpacity:0.35
+    });
+    tempPoly.setMap(map);
+    return tempPoly;
+}
+
+function updateInfo(data){
+    data.forEach(function(datamarker){
+        arrayPolygon.push(createPolygon(datamarker.val().geometry.points));
+    });
+}
+function showErr(err){
+    console.log(err);
+}
+document.getElementById("save").addEventListener("click",function(){
+    var lines={points:coords};
+    arrayPolygon.forEach(function(data){
+        data.setMap(null);
+    });
+    markers.forEach(function(data){
+        data.setMap(null);
+    });
+   
+dataRef.push(
+            {
+                type: 'polyline',
+                geometry: lines
+            }
+        );
+        coords=[];
+});
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE&callback=initMap"></script>
+<h5 style="color:darkgreen; font-family:'Franklin Gothic Medium';"><center>1617051049-1617051075-1617051099</center></h5>
+</body>
+</html>
