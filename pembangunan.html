@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>RTHKP</title>
-    <h2 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Area Ruang Terbuka Hijau Kawasan Perkotaan</center></h2>
-    <h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>di Bandar Lampung</center></h4>
+    <h2 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Area Ruang Terbuka Hijau Kawasan Perkotaan di Bandar Lampung</center></h2>
+    <h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>Dalam Pembangunan</center></h4>
     <style>
         #map{
             height: 490px;
@@ -57,7 +57,7 @@
 <div id="map"></div>
     <!-- latitude<input type="text" id="latitude">
     longitude<input type="text" id="latitude"> -->
-   
+    
     <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
     <script>
       // Initialize Firebase
@@ -72,7 +72,7 @@
   firebase.initializeApp(config);
 
 var db              = firebase.database();
-var dataRef         = db.ref('polygon');
+var dataRef         = db.ref('sig ptbdl');
 var newPolygon      = null;
 var arrayPolygon    = [];
 var map             = null;
@@ -84,7 +84,7 @@ dataRef.on('value', updateInfo, showErr);
 
 function initMap(){
     map=new google.maps.Map(document.getElementById('map'),{
-        zoom:11,
+        zoom:12,
         center:center
     });
 
@@ -146,6 +146,7 @@ dataRef.push(
                 geometry: lines,
                 info:'Unila'
             });
+
 
 </script>
 
