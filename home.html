@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="dropdown.css">
+    <br>
+    <title>Sistem Informasi Geografis</title>
+    <h1 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Sistem Informasi Geografis</center></h1>
+    <h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>- Ruang Terbuka Hijau Kawasan Perkotaan -</center></h4>
+    <br>
+    <script src="geo.js"></script>
+    <style>
+            html,body, #map {
+                 background-color: white;
+                   width: 100%;
+                   height: 485px;}
+                
+            .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            width: 10px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          }
+          #searchInput {
+              background-color: white;
+              font-family: Roboto;
+              font-size: 15px;
+              font-weight: 300;
+              margin-left: 12px;
+              padding: 0 11px 0 13px;
+              text-overflow: ellipsis;
+              width: 300px;
+          }
+          #searchInput:focus {
+              border-color: darkcyan;
+          }
+        
+             </style>
+  
+</head>
+<body style= "background-color:rgb(191, 247, 191)">
+        
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a>
+                    <ul>
+                        <li><a href="RTH.html">Lihat dengan Cluster</a></li>
+                        <li><a href="polygon-template.html">Lihat dengan Polygon</a></li>
+                        <li><a href="geomarker.html">Lihat dengan Geojson</a></li>
+                    </ul>
+                <li><a href="#">Klasifikasi RTH</a>
+                    <ul>
+                        <li><a href="alamatnya">RTH Alih Fungsi</a></li>
+                        <li><a href="aktif.html">RTH Aktif</a></li>
+                        <li><a href="pembangunan.html">RTH dalam Pembangunan</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Jalur</a>
+                    <ul>
+                        <li><a href="pusatkota.html">Dari Pusat Kota</a></li>
+                        <li><a href="rajabasa.html">Dari Terminal Rajabasa</a></li>
+                    </ul>
+                </li>
+                <li><a href="alamatnya" onClick="return confirm ('Hubungi bebekgoreng@gmail.com')">Help</a></li>
+            </ul>
+        </nav>
+        <div id="garis"></div>
+        <input id="searchInput" class="controls" type="text" placeholder="Cari RTH">
+    <div id="map"></div>
+    <script src="https://www.gstatic.com/firebasejs/5.0.3/firebase.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE&callback=initMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE&libraries=places&callback=initMap" async defer></script>
+    <script>
+    
+    var map = null;
+    var center = {lat:-5.367284, lng:105.244935};
+    var infowindow;
+
+    var config = {
+        apiKey: "AIzaSyApVSRvpPuBB2xgoq_TNAvCxu-rq-6d-IA",
+        authDomain: "geojson-3486b.firebaseapp.com",
+        databaseURL: "https://geojson-3486b.firebaseio.com",
+        projectId: "geojson-3486b",
+        storageBucket: "geojson-3486b.appspot.com",
+        messagingSenderId: "1061907107463"
+    };
+    firebase.initializeApp(config);
+
+
+    var db = firebase.database();
+    var dataRef = db.ref('bandar-lampung');
+
+    dataRef.on('value', showData, showError);
+    function showData(data){
+        //console.log(data.val());
+        map.data.addGeoJson(data.val());
+        map.data.setStyle({
+            fillColor : 'darkcyan' ,
+            strokeWeight: 0.5
+        });
+        map.data.addListener('click', function(event){
+          infoWindowContent = event.feature.getProperty('DESA')+"<br>"+event.feature.getProperty('univ')+"<br>"+event.feature.getProperty('info');
+          console.log(event.latLng);
+          infowindow.setContent(infoWindowContent);
+          infowindow.setPosition(event.latLng);
+          infowindow.open(map)  
+        });
+    }
+    function showError(err){
+        console.log(err);
+    }
+
+function initMap(){
+    map = new google.maps.Map(document.getElementById('map'),{
+        zoom: 10,
+        center: center
+    });
+
+    infowindow = new google.maps.InfoWindow();
+
+
+    var infowindowpusat = new google.maps.InfoWindow();
+    var contentStringpusat = '<h3>Pusat Kota Bandar Lampung</h3><hr>'+
+                                    '<h4>Selamat Datang</h4>';
+    infowindowpusat.setContent(contentStringpusat);
+    var marker = new google.maps.Marker({
+        position:new google.maps.LatLng(-5.402599,105.264040)
+        });
+    marker.addListener('click',function(){
+    infowindowpusat.open(map,marker);
+    });
+
+    marker.setMap(map);
+
+    var input = document.getElementById('searchInput');
+map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+var autocomplete = new google.maps.places.Autocomplete(input);
+autocomplete.bindTo('bounds', map);
+
+var infowindowlokasi = new google.maps.InfoWindow();
+var markerlokasi = new google.maps.Marker({
+map: map,
+anchorPoint: new google.maps.Point(0, -29)
+});
+
+autocomplete.addListener('place_changed', function() {
+infowindowlokasi.close();
+markerlokasi.setVisible(false);
+var place = autocomplete.getPlace();
+if (!place.geometry) {
+    window.alert("Autocomplete's returned place contains no geometry");
+    return;
+}
+
+// If the place has a geometry, then present it on a map.
+if (place.geometry.viewport) {
+    map.fitBounds(place.geometry.viewport);
+} else {
+    map.setCenter(place.geometry.location);
+    map.setZoom(17);
+}
+markerlokasi.setIcon(({
+    url: place.icon,
+    size: new google.maps.Size(71, 71),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(17, 34),
+    scaledSize: new google.maps.Size(35, 35)
+}));
+markerlokasi.setPosition(place.geometry.location);
+markerlokasi.setVisible(true);
+
+var address = '';
+if (place.address_components) {
+    address = [
+      (place.address_components[0] && place.address_components[0].short_name || ''),
+      (place.address_components[1] && place.address_components[1].short_name || ''),
+      (place.address_components[2] && place.address_components[2].short_name || '')
+    ].join(' ');
+}
+
+infowindowlokasi.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+infowindowlokasi.open(map, markerlokasi);
+
+    });
+
+            markerlokasi.addListener('click',function(){
+                    infowindowlokasi.open(map,markerlokasi);
+                    });
+                    markerlokasi.setMap(map);
+        }
+  
+    var markers = locations.map(function(location, i) {
+    var marker = new google.maps.Marker({position: location});
+
+    google.maps.event.addListener(marker, 'click', function(evt){
+	infoWin.setContent(location.info);
+	infoWin.open(map, marker);
+	})
+    return marker;
+	});
+    // Add a marker clusterer to manage the markers.
+	var markerCluster = new MarkerClusterer(map, markers, {
+    imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+	});
+    
+    var locations = [
+        {lat: -5.421654, lng: 105.259917, info: '<h3 style = background:#7EF84C;"><center>TAMAN GAJAH</center></h3><hr> <h4>Luas Daerah 15.000 m2, diresmikan pada 10 feb 2018</h4>'},
+        {lat: -5.400208, lng: 105.207889, info: '<h3 style = background:#7EF84C;"><center>TAMAN KALPATARU</center></h3><hr> <h4>Fasilitas olah raga yang tersedia adalah lapangan sepak bola & jogging track di sekeliling lapangan</h4>'},
+		{lat: -5.445769, lng: 105.262162, info: '<h3 style = background:#7EF84C;"><center>TAMAN DIPANGGA</center></h3><hr> <h4>Luas Daerah 800 m2, didirikan pada tahun 1981</h4>'},
+        {lat: -5.380881, lng: 105.284523, info: '<h3 style = background:#7EF84C;"><center>TAMAN HUTAN KOTA</center></h3><hr> <h4>Merupakan salah satu kawasan konservasi alam di Kota Bandar Lampung</h4>'},
+        {lat: -5.4186770922581, lng: 105.26024378419, info:'<h3 style =background:#7EF84C;"><center>Lapangan Enggal Saburai</center></h3><hr> <h4>Merupakan RTH dibawah pengwasan Korem 043/Gatam yang berfungsi sebagai pusat latihan baris-berbaris atau event-event besar pemerintah provinsi/kota</h4>'},
+		{lat:  -5.443950, lng: 105.268740, info:'<h3 style =background:#7EF84C;"><center>Taman Refleksi</center></h3><hr> <h4>Taman ini memiliki ciri khas trek refleksi dengan panjang mencapai 250 meter mengelilingi taman.</h4>'},
+		{lat:  -5.429119, lng: 105.261522, info:'<h3 style =background:#7EF84C;"><center>Taman Kota Lungsir</center></h3><hr> <h4>Merupakann Ruang Terbuka Hijau yang aktif sebagai tempat wisata kuliner di malam hari.</h4>'},
+		{lat:  -5.432279, lng: 105.269484, info:'<h3 style =background:#7EF84C;"><center>Taman Wisata Hutan Kera</center></h3><hr> <h4>Kawasan hutan wisata sejak tahun 1984,terdapat pemandangan kera liar dan pemandangan kota dengan view laut</h4>'},
+		{lat:  -5.440251, lng: 105.265634, info:'<h3 style =background:#7EF84C;"><center>Tugu Perbankan Lampung</center></h3><hr> <h4>merupakan Wisata Sejarah dan Budaya</h4>'},
+		];
+
+	google.maps.event.addDomListener(window, "load", initMap);
+    </script>
+    <script src="src/markerclusterer.js"></script>
+</body>
+
+</html>
