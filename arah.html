@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+        <link rel="stylesheet" type="text/css" href="arah.css"></link>
+
+<h1>Petunjuk Jalan</h1>
+<div id="map"></div>
+	
+<div class="samping">
+	<div>
+		<h3>Lokasi RTH</h3>
+		<input type="text" id="alamat" placeholder="Alamat" title="Alamat"/>
+		<select id="type">
+			<option value="Aktif">Aktif</option>
+			<option value="Pembangunan">Pembangunan</option>
+			<option value="alihFungsi">Alih Fungsi</option>
+		</select>
+		<textarea id="keterangan" placeholder="Keterangan" title="Keterangan"></textarea>
+		<button id="add">Add Lokasi</button>
+		<button id="hapus">Hapus semua Lokasi</button>
+		<hr>
+		<h3>Titik Awal</h3>
+		<input type="text" id="lokasi" placeholder="Lokasi saya sekarang" title="Lokasi saya sekarang" value="Terminal Rajabasa"/>
+		<button id="cari">Cari Jalur</button>
+	</div>	
+</div>
+<br><br>	
+<div id="pano">tempat unntuk menampilkan panorama lokasi</div><div id="rute">tempat unntuk menampilkan rute jalan</div>
+<br><br>
+		
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE&language=in&region=ID"></script>
+        <script type="text/javascript" src="geojquery.js"></script>
+<script>
+// GPS
+var lokasiSaya = "Terminal Rajabasa";
+
+// Contoh data lokasi rth
+// atau ambil dari database
+var rth = [{
+        "lat": "-5.421983",
+        "lng": "105.259930",
+        "alamat": "Taman Gajah Lampung, Enggal, Kota Bandar Lampung, Lampung",
+        "keterangan": "Luas Daerah 15.000 m2, diresmikan pada 10 feb 2018",
+        "type": "Aktif"
+    },
+    {
+        "lat": "-5.445769",
+        "lng": "105.262162",
+        "alamat": "Taman Dipangga, Jalan Wolter Monginsidi, Talang, Kota Bandar Lampung, Lampung",
+        "keterangan": "Luas Daerah 800 m2, didirikan pada tahun 1981",
+        "type": "Pembangunan"
+    },
+    {
+        "lat": "-5.400208",
+        "lng": "105.207889",
+        "alamat": "Lapangan Kalpataru, Beringin Raya, Kota Bandar Lampung, Lampung",
+        "keterangan": "Fasilitas olah raga yang tersedia adalah lapangan sepak bola & jogging track di sekeliling lapangan",
+        "type": "Aktif"
+    },
+    {
+        "lat": "-5.380881",
+        "lng": "105.284523",
+        "alamat": "Taman hutan kota, Way Dadi, Sukarame, Kota Bandar Lampung, Lampung 35133",
+        "keterangan": "Merupakan salah satu kawasan konservasi alam di Kota Bandar Lampung",
+        "type": "Aktif"
+    },
+    {
+        "lat": "-5.4186770922581",
+        "lng": "105.26024378419",
+        "alamat": "Lapangan Saburai Korem 043/Gatam",
+        "keterangan": "Merupakan RTH dibawah pengwasan Korem 043/Gatam yang berfungsi sebagai pusat latihan baris-berbaris atau event-event besar pemerintah provinsi/kota",
+        "type": "alihFungsi"
+    },
+    {
+        "lat": "-5.443950",
+        "lng": "105.268740",
+        "alamat": "Taman Refleksi, Jalan Wage Rudolf Supratman, Gunung MAS, Kota Bandar Lampung, Lampung",
+        "keterangan": "Taman ini memiliki ciri khas trek refleksi dengan panjang mencapai 250 meter mengelilingi taman.",
+        "type": "Aktif"
+    },
+    {
+        "lat": "-5.429119",
+        "lng": "105.261522",
+        "alamat": "Lungsir (Taman Kota), Gulak Galik, Kota Bandar Lampung, Lampung",
+        "keterangan": "Merupakan Ruang Terbuka Hijau yang aktif sebagai tempat wisata kuliner di malam hari.",
+        "type": "Aktif"
+    },
+    {
+        "lat": "-5.432279",
+        "lng": "105.269484",
+        "alamat": "Taman Wisata Hutan Kera, Sumur Batu, Kota Bandar Lampung, Lampung",
+        "keterangan": "Kawasan hutan wisata sejak tahun 1984,terdapat pemandangan kera liar dan pemandangan kota dengan pemandangan laut",
+        "type": "Aktif"
+    },
+    {
+        "lat": "-5.440251",
+        "lng": "105.265634",
+        "alamat": "Tugu Perbankan Lampung, Gunung MAS, Kota Bandar Lampung, Lampung",
+        "keterangan": "Merupakan Wisata Sejarah dan Budaya",
+        "type": "alihFungsi"
+    }
+];
+
+var map;
+var lokasi = []; // penampung maker supaya bisa menampilkan banyak marker dan dinamis
+var rute = []; // penampung rute
+
+// merubah icon atau sobat bisa menggunakan icon sobat sendiri sesuai keinginan
+// tinggal masukan url image.y di bawah
+var iconBase = "https://maps.google.com/mapfiles/kml/shapes/";
+var icons = {
+    Aktif: {
+        icon: iconBase + 'parks.png'
+    },
+    Pembangunan: {
+        icon: iconBase + 'ranger_station.png'
+    },
+    alihFungsi: {
+        icon: iconBase + 'firedept.png'
+    }
+}
+
+function initialize() {
+    streetViewService = new google.maps.StreetViewService();
+    panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'));
+    map = new google.maps.Map(document.getElementById('map'), {
+        // peta indonesia
+        center: {
+            lat: -5.397985,
+            lng: 105.264555
+        },
+        zoom: 12.5,
+        zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_BOTTOM
+        }
+    });
+
+    findLokasi();
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+// fungsi untuk menampilkan data rth ke maps
+function findLokasi() {
+
+    var d = new google.maps.InfoWindow();
+    var e;
+
+    $.each(rth, function(i, b) {
+        // membuat maker dari lat, lng
+        e = new google.maps.Marker({
+            position: new google.maps.LatLng(b.lat, b.lng),
+            icon: icons[b.type].icon,
+            map: map
+        });
+
+        lokasi.push(e);
+
+        // membuat info window alamat
+        google.maps.event.addListener(e, 'click', (function(a, i) {
+            return function() {
+                //	alert(a.position.lat());
+                //	console.log(a.location);
+                d.setContent('<div><h3>' + b.alamat + '</h3><p>' + b.keterangan + '</p>'
+                    // tombol triger.y untuk menjalankan fungsi jarak
+                    +
+                    '<button class="detail" data-alamat="' + b.alamat + '" data-lat="' + b.lat + '" data-lng="' + b.lng + '">Detail</button></div>');
+                d.open(map, a)
+            }
+        })(e, i))
+    });
+}
+
+function addLokasi(alamat, keterangan, icon) {
+    // kita buat dulu proses untuk mendapatka lat & lng berdasarkan alamat yang kita input
+    $.ajax({
+        type: "GET",
+        url: 'https://maps.google.com/maps/api/geocode/json?address=' + alamat.replace(/\s+/g, '+') + '&sensor=&keyfalse=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE',
+        dataType: "json"
+    }).done(function(data) {
+        var d = new google.maps.InfoWindow();
+        var e;
+        var i;
+
+        // membuat maker dari lat, lng
+        e = new google.maps.Marker({
+            position: new google.maps.LatLng(data.results[0].geometry.location.lat, data.results[0].geometry.location.lng),
+            icon: icons[icon].icon,
+            map: map
+        });
+
+        lokasi.push(e);
+
+        // membuat info window alamat
+        google.maps.event.addListener(e, 'click', (function(a, i) {
+            return function() {
+                d.setContent('<div><h3>' + alamat + '</h3><p>' + keterangan + '</p>'
+                    // tombol triger.y untuk menjalankan fungsi jarak
+                    +
+                    '<button class="detail" data-alamat="' + alamat + '" data-lat="' + data.results[0].geometry.location.lat + '" data-lng="' + data.results[0].geometry.location.lng + '">Detail</button></div>');
+                d.open(map, a);
+            }
+        })(e, i));
+
+        var obj = {
+            lat: data.results[0].geometry.location.lat,
+            lng: data.results[0].geometry.location.lng,
+            alamat: alamat,
+            keterangan: keterangan,
+            type: icon
+        };
+
+        rth.push(obj);
+
+    });
+}
+
+function hapusLokasi() {
+    // cara.y yaitu kita set var lokasi = [] menjadi null
+    for (var i = 0; i < lokasi.length; i++) {
+        lokasi[i].setMap(null)
+    }
+
+    // data lokasi rth
+    rth = [];
+}
+
+function hapusRute() {
+    // cara.y yaitu kita set var rute = [] menjadi null
+    for (var i = 0; i < rute.length; i++) {
+        rute[i].setMap(null)
+    }
+}
+
+// kita buat funsi jarak
+function jarak(alamat) {
+    var a = new google.maps.DirectionsService();
+    var b = new google.maps.DirectionsRenderer({
+        preserveViewport: true
+    });
+    // menamppilkan rute di maps
+    b.setMap(map);
+    // menamppilkan rute di div #rute
+    b.setPanel(document.getElementById('rute'));
+    // menambahkan rute baru ke array rute
+    rute.push(b);
+    // data request
+    var request = {
+        origin: lokasiSaya,
+        destination: alamat,
+        travelMode: google.maps.DirectionsTravelMode.DRIVING
+    };
+    a.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+            b.setDirections(response);
+        }
+    });
+
+}
+
+function lihatPano(alat, alon) {
+    var STREETVIEW_MAX_DISTANCE = 100;
+    var latLng = new google.maps.LatLng(alat, alon);
+    streetViewService.getPanoramaByLocation(latLng, STREETVIEW_MAX_DISTANCE, function(streetViewPanoramaData, status) {
+        if (status === google.maps.StreetViewStatus.OK) {
+            panorama.setPano(streetViewPanoramaData.location.pano);
+        } else {
+            alert('Panorama tidak tersedia.');
+        }
+    });
+}
+
+function jarakTerdekat(dari, callback) {
+    var ke = rth.map(function(obj) {
+        return obj.alamat;
+    });
+    var distanceService = new google.maps.DistanceMatrixService();
+    distanceService.getDistanceMatrix({
+            origins: [dari],
+            destinations: ke,
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+            durationInTraffic: false,
+            avoidHighways: false,
+            avoidTolls: false
+        },
+        function(response, status) {
+            if (status !== google.maps.DistanceMatrixStatus.OK) {
+                alert('Error:', status);
+            } else {
+                var tes = response.rows[0].elements.map(function(obj) {
+                    return obj.distance.value;
+                });
+                var min = Math.min.apply(null, tes);
+                callback(arraySearch(tes, min));
+            }
+        });
+}
+
+function arraySearch(arr, val) {
+    for (var i = 0; i < arr.length; i++)
+        if (arr[i] === val)
+            return i;
+    return false;
+}
+
+// function.y sudah tinggal kita panggi function finLokasi.y
+$(function() {
+
+    $("#add").click(function() {
+        addLokasi($("#alamat").val(), $("#keterangan").val(), $("#type").val());
+    });
+
+    $("#hapus").click(function() {
+        hapusLokasi();
+    });
+
+    $("#cari").click(function() {
+        lokasiSaya = ($("#lokasi").val() == '' ? lokasiSaya : $("#lokasi").val());
+        $("#rute").empty();
+        hapusRute();
+        jarakTerdekat($("#lokasi").val(), function(data) {
+            jarak(rth[data].alamat);
+            lihatPano(rth[data].lat, rth[data].lng);
+        });
+    });
+
+    $("body").on('click', '.detail', function() {
+        lokasiSaya = ($("#lokasi").val() == '' ? lokasiSaya : $("#lokasi").val());
+        // mengosongkan div #rute dulu biar tidak numpuk rute.y (hanya menampilkan rute marker yang di klik)
+        $("#rute").empty();
+        // menghapus rute sebelum.y yang di maps
+        hapusRute();
+        // menampilkan rute baru
+        jarak($(this).data('alamat'));
+        // menampilkan panorama baru
+        lihatPano($(this).data('lat'), $(this).data('lng'));
+    });
+
+});
+</script>
+	</body>
+</html>

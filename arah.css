@@ -1,0 +1,36 @@
+/* Always set the map height explicitly to define the size of the div
+* element that contains the map. */
+#map {
+	width: 70%;
+	height: 100%;
+}
+
+.samping {
+	position: absolute;
+	top: 90px;
+	right: 0px;
+	width: 30%;
+	height: 100%;
+	overflow: auto;
+}
+
+.samping div {
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+#pano,
+#rute {
+	width: 50%;
+	height: 600px;
+	display: inline-block;
+	vertical-align: top;
+}
+
+/* Optional: Makes the sample page fill the window. */
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
