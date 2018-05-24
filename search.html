@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <style>
+            html,body, #map {
+                 background-color: white;
+                   width: 100%;
+                   height: 400px;}
+                
+            .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            width: 10px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          }
+          #searchInput {
+              background-color: white;
+              font-family: Roboto;
+              font-size: 15px;
+              font-weight: 300;
+              margin-left: 12px;
+              padding: 0 11px 0 13px;
+              text-overflow: ellipsis;
+              width: 300px;
+          }
+          #searchInput:focus {
+              border-color: darkcyan;
+          }
+        
+             </style>
+            
+</head>
+<body bgcolor=#008B8B>
+        <div id="garis"></div>
+        <input id="searchInput" class="controls" type="text" placeholder="Cari RTH">    
+    <div id="map"></div>
+    <script src="https://www.gstatic.com/firebasejs/5.0.3/firebase.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE&callback=initMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE&libraries=places&callback=initMap" async defer></script>
+   <script>
+        var map = null;
+        var center = {lat:-5.375130, lng:105.253640};
+        var infowindow;
+        var config = {
+            apiKey: "AIzaSyDVVpdm7iNoTiF77dVA2GcyHA3y-jlGEDE",
+    authDomain: "polygon-12.firebaseapp.com",
+    databaseURL: "https://polygon-12.firebaseio.com",
+    projectId: "polygon-12",
+    storageBucket: "polygon-12.appspot.com",
+    messagingSenderId: "1016968270496"
+  };
+  firebase.initializeApp(config);
+
+  var db=firebase.database();
+  var dataRef = db.ref(BandarLampung)
+
+    dataRef.on('value', showData, showError);
+    function showData(data){
+        //console.log(data.val());
+        map.data.addGeoJson(data.val());
+        map.data.setStyle({
+            fillColor : 'darkcyan' ,
+            strokeWeight: 0.5
+        });
+        map.data.addListener('click', function(event){
+          infoWindowContent = event.feature.getProperty('DESA');
+          console.log(event.latLng);
+          infowindow.setContent(infoWindowContent);
+          infowindow.setPosition(event.latLng);
+          infowindow.open(map)  
+        });
+    }
+    function showError(err){
+        console.log(err);
+    }
+
+function initMap(){
+    map = new google.maps.Map(document.getElementById('map'),{
+        zoom: 12,
+        center: center
+    });
+
+    infowindow = new google.maps.InfoWindow();
+
+
+    var infowindowpusat = new google.maps.InfoWindow();
+    var contentStringpusat = '<h3>Pusat Kota Bandar Lampung</h3><hr>'+
+                                    '<h4>Selamat Datang</h4>';
+    infowindowpusat.setContent(contentStringpusat);
+    var marker = new google.maps.Marker({
+        position:new google.maps.LatLng(-5.402599,105.264040)
+        });
+    marker.addListener('click',function(){
+    infowindowpusat.open(map,marker);
+    });
+
+    marker.setMap(map);
+
+    var input = document.getElementById('searchInput');
+map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+var autocomplete = new google.maps.places.Autocomplete(input);
+autocomplete.bindTo('bounds', map);
+
+var infowindowlokasi = new google.maps.InfoWindow();
+var markerlokasi = new google.maps.Marker({
+map: map,
+anchorPoint: new google.maps.Point(0, -29)
+});
+
+autocomplete.addListener('place_changed', function() {
+infowindowlokasi.close();
+markerlokasi.setVisible(false);
+var place = autocomplete.getPlace();
+if (!place.geometry) {
+    window.alert("Autocomplete's returned place contains no geometry");
+    return;
+}
+
+// If the place has a geometry, then present it on a map.
+if (place.geometry.viewport) {
+    map.fitBounds(place.geometry.viewport);
+} else {
+    map.setCenter(place.geometry.location);
+    map.setZoom(17);
+}
+markerlokasi.setIcon(({
+    url: place.icon,
+    size: new google.maps.Size(71, 71),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(17, 34),
+    scaledSize: new google.maps.Size(35, 35)
+}));
+markerlokasi.setPosition(place.geometry.location);
+markerlokasi.setVisible(true);
+
+var address = '';
+if (place.address_components) {
+    address = [
+      (place.address_components[0] && place.address_components[0].short_name || ''),
+      (place.address_components[1] && place.address_components[1].short_name || ''),
+      (place.address_components[2] && place.address_components[2].short_name || '')
+    ].join(' ');
+}
+
+infowindowlokasi.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+infowindowlokasi.open(map, markerlokasi);
+
+    });
+
+            markerlokasi.addListener('click',function(){
+                    infowindowlokasi.open(map,markerlokasi);
+                    });
+                    markerlokasi.setMap(map);
+        }
+  
+  
+    </script>
+</body>
+
+</html>
