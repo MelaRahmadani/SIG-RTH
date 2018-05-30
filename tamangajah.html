@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="dropdown.css">
+    <br>
+    <title>Sistem Informasi Geografis</title>
+    <h1 style= "color:darkgreen; font-family:'Franklin Gothic Medium';"><center>Sistem Informasi Geografis</center></h1>
+    <h4 style="color:darkolivegreen; font-family:'Franklin Gothic Medium';"><center>- Ruang Terbuka Hijau Kawasan Perkotaan -</center></h4>
+    <br>
+    <script src="geo.js"></script>
+    <style>
+            html,body, #map {
+                 background-color: white;
+                   width: 100%;
+                   height: 485px;}
+                
+            .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            width: 10px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          }
+          #searchInput {
+              background-color: white;
+              font-family: Roboto;
+              font-size: 15px;
+              font-weight: 300;
+              margin-left: 12px;
+              padding: 0 11px 0 13px;
+              text-overflow: ellipsis;
+              width: 300px;
+          }
+          #searchInput:focus {
+              border-color: darkcyan;
+          }
+        
+             </style>
+  
+</head>
+<body style= "background-color:rgb(191, 247, 191)">
+        
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a>
+                    <ul>
+                        <li><a href="RTH.html">Lihat dengan Cluster</a></li>
+                        <li><a href="polygon-template.html">Lihat dengan Polygon</a></li>
+                        <li><a href="geomarker.html">Lihat dengan Geojson</a></li>
+                    </ul>
+                <li><a href="#">Klasifikasi RTH</a>
+                    <ul>
+                        <li><a href="alamatnya">RTH Alih Fungsi</a></li>
+                        <li><a href="aktif.html">RTH Aktif</a></li>
+                        <li><a href="pembangunan.html">RTH dalam Pembangunan</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Jalur</a>
+                    <ul>
+                        <li><a href="pusatkota.html">Dari Pusat Kota</a></li>
+                        <li><a href="rajabasa.html">Dari Terminal Rajabasa</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Overlay</a>
+                    <ul>
+                        <li><a href="tamangajah.html">Taman Gajah</a></li>
+                        <li><a href="tamankalpataru.html">Taman Kalpataru</a></li>
+                        <li><a href="tamandipangga.html">Taman Dipangga</a></li>
+                        <li><a href="tamanhutankota.html">Taman Hutan Kota</a></li>
+                        <li><a href="saburai.html">Lapangan Enggal Saburai</a></li>
+                        <li><a href="tamanrefleksi.html">Taman Refleksi</a></li>
+                        <li><a href="tamanlungsir.html">Taman Kota Lungsir</a></li>
+                        <li><a href="tamanhutankera.html">Taman Wisata Hutan Kera</a></li>
+                        <li><a href="tuguperbankan.html">Tugu Perbankan Lampung</a></li>
+                    </ul>
+                </li>
+                <li><a href="alamatnya" onClick="return confirm ('Hubungi bebekgoreng@gmail.com')">Help</a></li>
+            </ul>
+        </nav>
+  
+    <body>
+          <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBs7q7TznMg3Ai1LjVMjIpmsoJRwU_zSIY"></script>
+          <script>
+      
+            var overlay;
+            USGSOverlay.prototype = new google.maps.OverlayView();
+      
+            // Initialize the map and the custom overlay.
+      
+            function initMap() {
+              var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 18,
+                center: {lat:-5.422166, lng:105.259686 },
+                mapTypeId: 'roadmap'
+              });
+      
+              var bounds = new google.maps.LatLngBounds(
+                new google.maps.LatLng(-5.422015, 105.259432),
+                  new google.maps.LatLng(-5.421943, 105.260432));
+      
+              var srcImage = 'images/tamangajah.jpg';
+              overlay = new USGSOverlay(bounds, srcImage, map);
+            }
+      
+            function USGSOverlay(bounds, image, map) {
+      
+              this.bounds_ = bounds;
+              this.image_ = image;
+              this.map_ = map;
+              this.div_ = null;
+              this.setMap(map);
+            }
+            USGSOverlay.prototype.onAdd = function() {
+      
+              var div = document.createElement('div');
+              div.style.borderStyle = 'none';
+              div.style.borderWidth = '0px';
+              div.style.position = 'absolute';
+      
+              var img = document.createElement('img');
+              img.src = this.image_;
+              img.style.width = '100%';
+              img.style.height = '800%';
+              img.style.position = 'absolute';
+              div.appendChild(img);
+      
+              this.div_ = div;
+      
+              // Add the element to the "overlayLayer" pane.
+              var panes = this.getPanes();
+              panes.overlayLayer.appendChild(div);
+            };
+      
+            USGSOverlay.prototype.draw = function() {
+              var overlayProjection = this.getProjection();
+              var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+              var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+      
+              var div = this.div_;
+              div.style.left = sw.x + 'px';
+              div.style.top = ne.y + 'px';
+              div.style.width = (ne.x - sw.x) + 'px';
+              div.style.height = (sw.y - ne.y) + 'px';
+            };
+      
+            USGSOverlay.prototype.onRemove = function() {
+              this.div_.parentNode.removeChild(this.div_);
+              this.div_ = null;
+            };
+      
+            google.maps.event.addDomListener(window, 'load', initMap);
+          </script>
+      <div id="map"></div>
+
+    </body>
+</html>
